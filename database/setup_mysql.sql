@@ -47,6 +47,7 @@ IF NOT EXISTS booking
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (destination_id) REFERENCES destination(id)
+    completed BOOLEAN
 );
 INSERT INTO booking
     (user_id, destination_id, flight_id, hotel_id, bus_id, date)
