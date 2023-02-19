@@ -60,7 +60,6 @@ class Booking(Base):
     hotel_id = Column(Integer, ForeignKey('hotels.id'), nullable=False)
     bus_id = Column(Integer, ForeignKey('buses.id'), nullable=False)
     dates_id = Column(Integer, ForeignKey('dates.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     def __init__(self, *args, **kwargs):
         """Instantiates booking object"""
