@@ -1,7 +1,7 @@
 """
 create test cases for all methods in models.py
 """
-from classes.models import User, Booking, Destination, Date, Payment
+from classes.models import User, Booking, Destination, Date, Payment, Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,9 +11,10 @@ import os
 import json
 import uuid
 import hashlib
-import app
+from app import app
 from werkzeug.security import generate_password_hash, check_password_hash
 from classes import storage
+
 
 class TestModels(unittest.TestCase):
     """Test models"""

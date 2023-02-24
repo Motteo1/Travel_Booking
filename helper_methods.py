@@ -25,7 +25,7 @@ from flask import Flask
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import os
-import app
+from app import app
 from threading import Thread
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'

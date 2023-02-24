@@ -1,6 +1,21 @@
 """
 create test cases for all methods in engine.py
 """
+
+from datetime import datetime
+import unittest
+import os
+import json
+import uuid
+import hashlib
+from app import app
+from werkzeug.security import generate_password_hash, check_password_hash
+from classes import storage
+from classes.models import Base, User, Booking
+from sqlalchemy.orm.session import object_session
+from sqlalchemy.orm import sessionmaker
+
+
 Base.metadata.create_all(self.__engine)
 Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
 self.__session = Session()
@@ -22,3 +37,4 @@ def count(self, cls=None):
     if cls:
         return len(self.all(cls))
     return len(self.all())
+

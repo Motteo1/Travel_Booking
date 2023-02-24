@@ -3,6 +3,12 @@ from datetime import date
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import object_session
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Integer, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.orm.session import object_session
+from flask_login import UserMixin
+from classes import storage
 
 
 Base = declarative_base()
@@ -43,7 +49,7 @@ class User(Base):
 
     def __set_password(self, password):
         """Hashes password"""
-        secure_pw = bcrypt.generate_password_hash(password)
+        secure_pw = generate_password_hash(password)
         setattr(self, 'password', secure_pw)
 
 

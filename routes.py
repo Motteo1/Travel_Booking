@@ -4,15 +4,16 @@
 import sys
 import os
 import requests
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, session, abort, render_template
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_mail import Mail, Message
 from flask_cors import CORS
 import hashlib
-import app
+from app import app
 from werkzeug.security import generate_password_hash, check_password_hash
-from classes.models import User, Booking, Destination, Flight, Hotel
+from classes.models import User, Booking, Destination, Flight, Hotel, Payment, Bus, Date
 from classes import storage
+import helper_methods
 
 # app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.url_map.strict_slashes = False
