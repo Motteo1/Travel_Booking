@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS 'destination';
 DROP TABLE IF EXISTS 'flight';
 DROP TABLE IF EXISTS 'hotel';
 DROP TABLE IF EXISTS 'bus';
+DROP TABLE IF EXISTS 'payment';
 
 CREATE TABLE
 IF NOT EXISTS user
@@ -123,3 +124,19 @@ INSERT INTO bus
     (id, destination_id, departure, arrival, date, time, price)
 VALUES
     (0, "destination_id", "departure", "arrival", "date", "time", "price");
+
+CREATE TABLE
+IF NOT EXISTS payment
+(
+    id INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    booking_id INT NOT NULL,
+    amount INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (booking_id) REFERENCES booking(id)
+);
+INSERT INTO payment
+    (id, user_id, booking_id, amount)
+VALUES
+    (0, "user_id", "booking_id", "amount");
