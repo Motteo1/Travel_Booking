@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from database import DBStorage
+from database.engine import DBStorage
 
 storage = DBStorage()
 storage.reload()
