@@ -30,7 +30,16 @@ class DBStorage:
             self.__session.commit()
         except:
             self.__session.rollback()
-        
+    
+    def new(self, obj):
+        """Add object to database"""
+        try:
+            self.__session.add(obj)
+            self.__session.commit()
+        except:
+            self.__session.rollback()
+
+
     def delete(self, obj=None):
         """Delete object from database"""
         self.__session.delete(obj)
@@ -58,6 +67,13 @@ class DBStorage:
             key = obj.__class__.__name__ + "." + obj.id
             payment_dict[key] = obj
         return payment_dict
+    
+        """Return all user objects from database"""
+        user_dict = {}
+        for obj in self.__session.query(User).all():
+            key = obj.__class__.__name__ + "." + obj.id
+            user_dict[key] = obj
+        return user_dict
     
     def count(self):
         """Count number of objects in database"""
