@@ -96,13 +96,15 @@ def is_booking_valid(booking):
         return False
     if booking.destination_id is None:
         return False
+    if booking.bus_id is None:
+        return False
     if booking.payment_id is None:
         return False
     return True
 
 def email_confirm_trip(booking):
     """Sends email to user confirming trip."""
-    msg = Message('Booking Confirmation', You have successfully booked a trip to {booking.destination.name} from {booking.flight.departure_date} to {booking.flight.return_date}. Your hotel is {booking.hotel.name} and your flight number is {booking.flight.flight_number}. Your total cost is {booking.payment.amount}. Thank you for using our service!)
+    msg = Message('Booking Confirmation', You have successfully booked your trip to {booking.destination.name} from {booking.flight.departure_date} to {booking.flight.return_date}. Your hotel is {booking.hotel.name} and your flight number is {booking.flight.flight_number}. Your total cost is {booking.payment.amount}. Thank you for using our service!)
     msg.add_recipient(current_user.email)
     mail.send(msg)
 
@@ -112,21 +114,26 @@ def email_cancel_trip(booking):
     msg.add_recipient(current_user.email)
     mail.send(msg)
 
-def skip_hotel(destination):
+def skip_hotel(destination, booking):
     """Returns True if hotel is not required. If not, returns False."""
     if destination.hotel_id is None:
         return True
     return False
+    if booking.hotel_id is None:
+        return True
 
-def skip_flight(destination):
+def skip_flight(destination, booking):
     """Returns True if flight is not required. If not, returns False."""
     if destination.flight_id is None:
         return True
     return False
+    if booking.flight_id is None:
+        return True
 
-def skip_bus(destination):
+def skip_bus(destination, booking):
     """Returns True if bus is not required. If not, returns False."""
     if destination.bus_id is None:
         return True
     return False
-
+    if booking.bus_id is None:
+        return True
