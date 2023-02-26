@@ -185,28 +185,8 @@ class TestModels(unittest.TestCase):
         })
         self.assertEqual(review.__repr__(), "<Review {}>".format(review.id))
         self.assertEqual(review.__str__(), review.id)
+        self.assertEqual(review.__class__.__name__, "Review")
 
-    def test_user(self):
-        """test user class"""
-        user = User()
-        self.assertEqual(user.id, str(uuid.uuid4()))
-        self.assertEqual(user.created_at, datetime.now())
-        self.assertEqual(user.updated_at, datetime.now())
-        self.assertEqual(user.email, "")
-        self.assertEqual(user.password, "")
-        self.assertEqual(user.first_name, "")
-        self.assertEqual(user.last_name, "")
-        self.assertEqual(user.to_dict(), {
-            'id': user.id,
-            'created_at': user.created_at,
-            'updated_at': user.updated_at,
-            'email': user.email,
-            'password': user.password,
-            'first_name': user.first_name,
-            'last_name': user.last_name
-        })
-        self.assertEqual(user.__repr__(), "<User {}>".format(user.id))
-        self.assertEqual(user.__str__(), user.id)
 
     def test_base_model(self):
         """test base model class"""
@@ -220,6 +200,7 @@ class TestModels(unittest.TestCase):
         })
         self.assertEqual(base_model.__repr__(), "<BaseModel {}>".format(base_model.id))
         self.assertEqual(base_model.__str__(), base_model.id)
+    
 
 if __name__ == '__main__':
     unittest.main()

@@ -37,4 +37,3 @@ def count(self, cls=None):
     if cls:
         return len(self.all(cls))
     return len(self.all())
-
