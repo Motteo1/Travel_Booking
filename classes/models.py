@@ -41,7 +41,7 @@ class User(Base, UserMixin):
         self.contact = ""
 
         for k, v in kwargs.items():
-            if k is 'password':
+            if k == 'password':
                 User.__set_password(self, v)
             else:
                 setattr(self, k, v)
