@@ -17,7 +17,7 @@ Base = declarative_base()
 def find_user(user_id):
     return storage.get_user_by_id(user_id)
 
-class User(Base):
+class User(Base, UserMixin):
     """Class User is a blueprint to create user objects"""
 
     __tablename__ = 'users'
@@ -29,9 +29,8 @@ class User(Base):
     password = Column(String(128), nullable=False)
     contact = Column(String(128), nullable=False)
     bookings = relationship('Booking', backref='user', cascade='all, delete')
-    
-    
-    
+    payments = relationship('Payment', backref='user', cascade='all, delete')
+        
     
     def __init__(self, *args, **kwargs):
         """Instantiates user object"""
@@ -66,6 +65,7 @@ class Booking(Base):
     hotel_id = Column(Integer, ForeignKey('hotels.id'), nullable=False)
     bus_id = Column(Integer, ForeignKey('buses.id'), nullable=False)
     dates_id = Column(Integer, ForeignKey('dates.id'), nullable=False)
+    payments = relationship('Payment', backref='booking', cascade='all, delete')
 
     def __init__(self, *args, **kwargs):
         """Instantiates booking object"""
@@ -75,6 +75,7 @@ class Booking(Base):
         self.hotel_id = ""
         self.bus_id = ""
         self.dates_id = ""
+        self.payments = ""
 
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -132,6 +133,60 @@ class Payment(Base):
         self.booking_id = ""
         self.amount = ""
         self.date = ""
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+    
+class Flight(Base):
+    """Class Flight is a blueprint to create flight objects"""
+
+    __tablename__ = 'flights'
+
+    id = Column(Integer, nullable=False, primary_key=True)
+    name = Column(String(128), nullable=False)
+    price = Column(Float, nullable=False)
+    bookings = relationship('Booking', backref='flight', cascade='all, delete')
+
+    def __init__(self, *args, **kwargs):
+        """Instantiates flight object"""
+        self.name = ""
+        self.price = ""
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+class Hotel(Base):
+    """Class Hotel is a blueprint to create hotel objects"""
+
+    __tablename__ = 'hotels'
+
+    id = Column(Integer, nullable=False, primary_key=True)
+    name = Column(String(128), nullable=False)
+    price = Column(Float, nullable=False)
+    bookings = relationship('Booking', backref='hotel', cascade='all, delete')
+
+    def __init__(self, *args, **kwargs):
+        """Instantiates hotel object"""
+        self.name = ""
+        self.price = ""
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+class Bus(Base):
+    """Class Bus is a blueprint to create bus objects"""
+
+    __tablename__ = 'buses'
+
+    id = Column(Integer, nullable=False, primary_key=True)
+    name = Column(String(128), nullable=False)
+    price = Column(Float, nullable=False)
+    bookings = relationship('Booking', backref='bus', cascade='all, delete')
+
+    def __init__(self, *args, **kwargs):
+        """Instantiates bus object"""
+        self.name = ""
+        self.price = ""
 
         for k, v in kwargs.items():
             setattr(self, k, v)
