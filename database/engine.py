@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 """Database for Storage"""
-from classes.models import Base, User, Booking, Destination, Date, Payment
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+from classes.models import Base, User, Booking, Destination, Date, Payment
+import pymysql as MySQLdb
 Base = declarative_base()
 
 class DBStorage:

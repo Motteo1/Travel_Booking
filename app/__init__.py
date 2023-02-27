@@ -9,5 +9,3 @@ app.config['SECRET_KEY'] = 'secret'
 login_user = LoginManager(app)
 login_user.login_view = 'login'
 login_user.login_message = 'Please login to access this page.'
-
-from app import routes

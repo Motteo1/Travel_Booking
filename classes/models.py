@@ -8,12 +8,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm.session import object_session
 from flask_login import UserMixin
-from classes import storage
+
 
 
 Base = declarative_base()
 
-@login_user.user_loader
+
 def find_user(user_id):
     return storage.get_user_by_id(user_id)
 
