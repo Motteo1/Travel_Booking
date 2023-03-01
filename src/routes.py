@@ -1,19 +1,20 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """APP"""
-import sys
-import os
-import requests
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, session, abort, render_template
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask_mail import Mail, Message
+from flask import request, jsonify, abort, flash, url_for, make_response, session
+from flask_login import current_user, login_user, logout_user, login_required
 from flask_cors import CORS
+from flask_mail import Mail, Message
 import hashlib
-from app import app
-from werkzeug.security import generate_password_hash, check_password_hash
-from classes.models import User, Booking, Destination, Flight, Hotel, Payment, Bus, Date
-from classes import storage
+from src import app
+from src.classes.models import User, Booking, Destination, Flight, Hotel, Payment, Bus, Date
+from src.classes import storage
 import helper_methods
+import os
+import random
+import string
+import string
+from werkzeug.security import check_password_hash
 
 # app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.url_map.strict_slashes = False
