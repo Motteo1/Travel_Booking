@@ -3,8 +3,7 @@
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
-from classes.models import Base, User, Booking, Destination, Date, Payment
-import MySQLdb
+from src.classes.models import Base, User, Booking
 Base = declarative_base()
 
 class DBStorage:
