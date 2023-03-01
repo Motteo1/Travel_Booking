@@ -31,16 +31,14 @@ class TestModels(unittest.TestCase):
     def get(self, cls, id):
         """get object by id"""
         if cls and id:
-            key = cls + '.' + id
+            key = f'{cls}.{id}'
             if key in self.__objects:
                 return self.__objects[key]
         return None
 
     def count(self, cls=None):
         """count number of objects in storage"""
-        if cls:
-            return len(self.all(cls))
-        return len(self.all())
+        return len(self.all(cls)) if cls else len(self.all())
 
     def test_user(self):
         """test user class"""
@@ -68,7 +66,7 @@ class TestModels(unittest.TestCase):
             'is_active': user.is_active,
             'is_anonymous': user.is_anonymous
         })
-        self.assertEqual(user.__repr__(), "<User {}>".format(user.id))
+        self.assertEqual(user.__repr__(), f"<User {user.id}>")
         self.assertEqual(user.__str__(), user.id)
         self.assertEqual(user.__class__.__name__, "User")
         self.assertEqual(user.__class__.__tablename__, "users")
@@ -100,7 +98,7 @@ class TestModels(unittest.TestCase):
             'date_id': booking.date_id,
             'payment_id': booking.payment_id
         })
-        self.assertEqual(booking.__repr__(), "<Booking {}>".format(booking.id))
+        self.assertEqual(booking.__repr__(), f"<Booking {booking.id}>")
         self.assertEqual(booking.__str__(), booking.id)
         self.assertEqual(booking.__class__.__name__, "Booking")
         self.assertEqual(booking.__class__.__tablename__, "bookings")
@@ -131,7 +129,7 @@ class TestModels(unittest.TestCase):
             'description': destination.description,
             'price': destination.price
         })
-        self.assertEqual(destination.__repr__(), "<Destination {}>".format(destination.id))
+        self.assertEqual(destination.__repr__(), f"<Destination {destination.id}>")
         self.assertEqual(destination.__str__(), destination.id)
 
     def test_date(self):
@@ -147,7 +145,7 @@ class TestModels(unittest.TestCase):
             'updated_at': date.updated_at,
             'date': date.date
         })
-        self.assertEqual(date.__repr__(), "<Date {}>".format(date.id))
+        self.assertEqual(date.__repr__(), f"<Date {date.id}>")
         self.assertEqual(date.__str__(), date.id)
 
     def test_payment(self):
@@ -163,7 +161,7 @@ class TestModels(unittest.TestCase):
             'updated_at': payment.updated_at,
             'amount': payment.amount
         })
-        self.assertEqual(payment.__repr__(), "<Payment {}>".format(payment.id))
+        self.assertEqual(payment.__repr__(), f"<Payment {payment.id}>")
         self.assertEqual(payment.__str__(), payment.id)
 
     def test_review(self):
@@ -183,7 +181,7 @@ class TestModels(unittest.TestCase):
             'destination_id': review.destination_id,
             'text': review.text
         })
-        self.assertEqual(review.__repr__(), "<Review {}>".format(review.id))
+        self.assertEqual(review.__repr__(), f"<Review {review.id}>")
         self.assertEqual(review.__str__(), review.id)
         self.assertEqual(review.__class__.__name__, "Review")
 
@@ -198,7 +196,7 @@ class TestModels(unittest.TestCase):
             'created_at': base_model.created_at,
             'updated_at': base_model.updated_at
         })
-        self.assertEqual(base_model.__repr__(), "<BaseModel {}>".format(base_model.id))
+        self.assertEqual(base_model.__repr__(), f"<BaseModel {base_model.id}>")
         self.assertEqual(base_model.__str__(), base_model.id)
     
 

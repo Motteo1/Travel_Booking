@@ -4,13 +4,12 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from classes.models import Base, User, Booking, Destination, Date, Payment
-import pymysql as MySQLdb
+import MySQLdb
 Base = declarative_base()
 
 class DBStorage:
     """Database storage class"""
-    __engine = None
-    __session = None
+    __slots__ = ['__engine', '__metadata', '__session']
 
     def __init__(self):
         """Create engine and link to database"""
@@ -18,13 +17,13 @@ class DBStorage:
         pwd = "root"
         host = "localhost"
         db = "booking"
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(user, pwd, host, db), pool_pre_ping=True)
-        self.__metadata = MetaData(bind=self.__engine)
-        factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        Session = scoped_session(factory)
-        self.__session = Session()
+        self.__engine = create_engine(f'mysql+mysqldb://{user}:{pwd}@{host}/{db}?charset=utf8mb4', pool_pre_ping=True)
+        self.__metadata = MetaData()
+        self.__metadata.reflect(bind=self.__engine)
+        Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = scoped_session(Session)()
 
-    def save(self, obj):
+    def save(self, obj):  # sourcery skip: do-not-use-bare-except
         """Save changes to database"""
         try:
             self.__session.add(obj)
@@ -32,7 +31,7 @@ class DBStorage:
         except:
             self.__session.rollback()
     
-    def new(self, obj):
+    def new(self, obj):  # sourcery skip: do-not-use-bare-except
         """Add object to database"""
         try:
             self.__session.add(obj)
@@ -51,47 +50,23 @@ class DBStorage:
         """Return all booking objects from database"""
         booking_dict = {}
         for obj in self.__session.query(Booking).all():
-            key = obj.__class__.__name__ + "." + obj.id
+            key = f"{obj.__class__.__name__}.{obj.id}"
             booking_dict[key] = obj
         return booking_dict
-
-        """Return all destination objects from database"""
-        destination_dict = {}
-        for obj in self.__session.query(Destination).all():
-            key = obj.__class__.__name__ + "." + obj.id
-            destination_dict[key] = obj
-        return destination_dict
-
-        """Return all payment objects from database"""
-        payment_dict = {}
-        for obj in self.__session.query(Payment).all():
-            key = obj.__class__.__name__ + "." + obj.id
-            payment_dict[key] = obj
-        return payment_dict
-    
-        """Return all user objects from database"""
-        user_dict = {}
-        for obj in self.__session.query(User).all():
-            key = obj.__class__.__name__ + "." + obj.id
-            user_dict[key] = obj
-        return user_dict
     
     def count(self):
         """Count number of objects in database"""
-        total = 0
-        for obj in self.__session.query(Booking).all():
-            total += 1
-        return total
+        return sum(1 for _ in self.__session.query(Booking).all())
     
     def get_booking_by_id(self, booking_id):
         """Get booking by id"""
         try:
-            obj = self.__session.query(Booking).filter_by(id=booking_id).first()
-            return obj
+            return self.__session.query(Booking).filter_by(id=booking_id).first()
         except(IndexError, TypeError):
             return None
     
     def get_booking_by_user_id(self, user_id):
+        # sourcery skip: inline-immediately-returned-variable
         """Get booking by user id"""
         try:
             obj = self.__session.query(Booking).filter_by(user_id=user_id).all()
@@ -102,13 +77,13 @@ class DBStorage:
     def get_user_by_id(self, user_id):
         """Get user by id"""
         try:
-            obj = self.__session.query(User).filter_by(id=user_id).first()
-            return obj
+            return self.__session.query(User).filter_by(id=user_id).first()
         except TypeError:
             print('Error at engine.get_user_by_id X___X')
             return None
     
     def get_user_by_email(self, email):
+        # sourcery skip: inline-immediately-returned-variable
         """Get user by email"""
         try:
             obj = self.__session.query(User).filter_by(email=email).first()

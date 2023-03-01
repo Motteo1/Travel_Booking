@@ -33,75 +33,66 @@ def index():
 @app.route('/api/v1/users', methods=['POST'])
 def create():
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        data = request.get_json()
-        if data:
-            if data['destination'] and data['flight'] and data['hotel'] and data['bus'] and data['payment'] and data['date']:
-                destination = storage.get(Destination, data['destination'])
-                flight = storage.get(Flight, data['flight'])
-                hotel = storage.get(Hotel, data['hotel'])
-                bus = storage.get(Bus, data['bus'])
-                payment = storage.get(Payment, data['payment'])
-                if destination and flight and hotel and bus and payment:
-                    booking = Booking()
-                    booking.user_id = uin
-                    booking.destination_id = destination.id
-                    booking.flight_id = flight.id
-                    booking.hotel_id = hotel.id
-                    booking.bus_id = bus.id
-                    booking.payment_id = payment.id
-                    booking.date_id = data['date']
-                    booking.total = destination.price + flight.price + hotel.price + bus.price
-                    storage.new(booking)
-                    storage.save()
-                    return jsonify(booking.to_dict()), 201
-                return jsonify({"error": "Not found"}), 404
-            return jsonify({"error": "Missing data"}), 400
-        return jsonify({"error": "Not a JSON"}), 400
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if data := request.get_json():
+        if data['destination'] and data['flight'] and data['hotel'] and data['bus'] and data['payment'] and data['date']:
+            destination = storage.get(Destination, data['destination'])
+            flight = storage.get(Flight, data['flight'])
+            hotel = storage.get(Hotel, data['hotel'])
+            bus = storage.get(Bus, data['bus'])
+            payment = storage.get(Payment, data['payment'])
+            if destination and flight and hotel and bus and payment:
+                booking = Booking()
+                booking.user_id = uin
+                booking.destination_id = destination.id
+                booking.flight_id = flight.id
+                booking.hotel_id = hotel.id
+                booking.bus_id = bus.id
+                booking.payment_id = payment.id
+                booking.date_id = data['date']
+                booking.total = destination.price + flight.price + hotel.price + bus.price
+                storage.new(booking)
+                storage.save()
+                return jsonify(booking.to_dict()), 201
+            return jsonify({"error": "Not found"}), 404
+        return jsonify({"error": "Missing data"}), 400
+    return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/users/<user_id>', methods=['GET', 'DELETE'])
 def get_delete(user_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            if request.method == 'GET':
-                return jsonify(user.to_dict())
-            if request.method == 'DELETE':
-                storage.delete(user)
-                storage.save()
-                return jsonify({}), 200
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if request.method == 'GET':
+            return jsonify(user.to_dict())
+        if request.method == 'DELETE':
+            storage.delete(user)
+            storage.save()
+            return jsonify({}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>', methods=['PUT'])
 def update(user_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            data = request.get_json()
-            if data:
-                for k, v in data.items():
-                    if k not in ['id', 'email', 'created_at', 'updated_at']:
-                        setattr(user, k, v)
-                storage.save()
-                return jsonify(user.to_dict()), 200
-            return jsonify({"error": "Not a JSON"}), 400
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if data := request.get_json():
+            for k, v in data.items():
+                if k not in ['id', 'email', 'created_at', 'updated_at']:
+                    setattr(user, k, v)
+            storage.save()
+            return jsonify(user.to_dict()), 200
+        return jsonify({"error": "Not a JSON"}), 400
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings', methods=['GET'])
 def get_bookings(user_id):
     """Get bookings"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
+    if uin := helper_methods.logged_in(current_user):
+        if user := storage.get(User, user_id):
             bookings = storage.all(Booking).values()
             return jsonify([booking.to_dict() for booking in bookings if booking.user_id == user.id])
         return jsonify({"error": "Not found"}), 404
@@ -110,264 +101,217 @@ def get_bookings(user_id):
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>', methods=['GET', 'DELETE'])
 def get_delete_booking(user_id, booking_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                if request.method == 'GET':
-                    return jsonify(booking.to_dict())
-                if request.method == 'DELETE':
-                    storage.delete(booking)
-                    storage.save()
-                    return jsonify({}), 200
-            return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if request.method == 'GET':
+                return jsonify(booking.to_dict())
+            if request.method == 'DELETE':
+                storage.delete(booking)
+                storage.save()
+                return jsonify({}), 200
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>', methods=['PUT'])
 def update_booking(user_id, booking_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                data = request.get_json()
-                if data:
-                    for k, v in data.items():
-                        if k not in ['id', 'user_id', 'destination_id', 'flight_id', 'hotel_id', 'bus_id', 'payment_id', 'date_id', 'created_at', 'updated_at']:
-                            setattr(booking, k, v)
-                    storage.save()
-                    return jsonify(booking.to_dict()), 200
-                return jsonify({"error": "Not a JSON"}), 400
-            return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if data := request.get_json():
+                for k, v in data.items():
+                    if k not in ['id', 'user_id', 'destination_id', 'flight_id', 'hotel_id', 'bus_id', 'payment_id', 'date_id', 'created_at', 'updated_at']:
+                        setattr(booking, k, v)
+                storage.save()
+                return jsonify(booking.to_dict()), 200
+            return jsonify({"error": "Not a JSON"}), 400
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/payment', methods=['POST'])
 def create_payment(user_id, booking_id):
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                data = request.get_json()
-                if data:
-                    if data['name'] and data['number'] and data['expiration_date'] and data['cvv']:
-                        payment = Payment()
-                        payment.name = data['name']
-                        payment.number = data['number']
-                        payment.expiration_date = data['expiration_date']
-                        payment.cvv = data['cvv']
-                        payment.booking_id = booking.id
-                        storage.new(payment)
-                        storage.save()
-                        return jsonify(payment.to_dict()), 201
-                    return jsonify({"error": "Missing data"}), 400
-                return jsonify({"error": "Not a JSON"}), 400
-            return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if data := request.get_json():
+                if data['name'] and data['number'] and data['expiration_date'] and data['cvv']:
+                    payment = Payment()
+                    payment.name = data['name']
+                    payment.number = data['number']
+                    payment.expiration_date = data['expiration_date']
+                    payment.cvv = data['cvv']
+                    payment.booking_id = booking.id
+                    storage.new(payment)
+                    storage.save()
+                    return jsonify(payment.to_dict()), 201
+                return jsonify({"error": "Missing data"}), 400
+            return jsonify({"error": "Not a JSON"}), 400
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/payment', methods=['GET', 'DELETE'])
 def get_delete_payment(user_id, booking_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                payment = storage.get(Payment, booking.payment_id)
-                if payment:
-                    if request.method == 'GET':
-                        return jsonify(payment.to_dict())
-                    if request.method == 'DELETE':
-                        storage.delete(payment)
-                        storage.save()
-                        return jsonify({}), 200
-                return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if payment := storage.get(Payment, booking.payment_id):
+                if request.method == 'GET':
+                    return jsonify(payment.to_dict())
+                if request.method == 'DELETE':
+                    storage.delete(payment)
+                    storage.save()
+                    return jsonify({}), 200
             return jsonify({"error": "Not found"}), 404
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/payment', methods=['PUT'])
 def update_payment(user_id, booking_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                payment = storage.get(Payment, booking.payment_id)
-                if payment:
-                    data = request.get_json()
-                    if data:
-                        for k, v in data.items():
-                            if k not in ['id', 'name', 'number', 'expiration_date', 'cvv', 'booking_id', 'created_at', 'updated_at']:
-                                setattr(payment, k, v)
-                        storage.save()
-                        return jsonify(payment.to_dict()), 200
-                    return jsonify({"error": "Not a JSON"}), 400
-                return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if payment := storage.get(Payment, booking.payment_id):
+                if data := request.get_json():
+                    for k, v in data.items():
+                        if k not in ['id', 'name', 'number', 'expiration_date', 'cvv', 'booking_id', 'created_at', 'updated_at']:
+                            setattr(payment, k, v)
+                    storage.save()
+                    return jsonify(payment.to_dict()), 200
+                return jsonify({"error": "Not a JSON"}), 400
             return jsonify({"error": "Not found"}), 404
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/date', methods=['POST'])
 def create_date(user_id, booking_id):
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                data = request.get_json()
-                if data:
-                    if data['start_date'] and data['end_date']:
-                        date = Date()
-                        date.start_date = data['start_date']
-                        date.end_date = data['end_date']
-                        date.booking_id = booking.id
-                        storage.new(date)
-                        storage.save()
-                        return jsonify(date.to_dict()), 201
-                    return jsonify({"error": "Missing data"}), 400
-                return jsonify({"error": "Not a JSON"}), 400
-            return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if data := request.get_json():
+                if data['start_date'] and data['end_date']:
+                    date = Date()
+                    date.start_date = data['start_date']
+                    date.end_date = data['end_date']
+                    date.booking_id = booking.id
+                    storage.new(date)
+                    storage.save()
+                    return jsonify(date.to_dict()), 201
+                return jsonify({"error": "Missing data"}), 400
+            return jsonify({"error": "Not a JSON"}), 400
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/date', methods=['GET', 'DELETE'])
 def get_delete_date(user_id, booking_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                date = storage.get(Date, booking.date_id)
-                if date:
-                    if request.method == 'GET':
-                        return jsonify(date.to_dict())
-                    if request.method == 'DELETE':
-                        storage.delete(date)
-                        storage.save()
-                        return jsonify({}), 200
-                return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if date := storage.get(Date, booking.date_id):
+                if request.method == 'GET':
+                    return jsonify(date.to_dict())
+                if request.method == 'DELETE':
+                    storage.delete(date)
+                    storage.save()
+                    return jsonify({}), 200
             return jsonify({"error": "Not found"}), 404
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/date', methods=['PUT'])
 def update_date(user_id, booking_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                date = storage.get(Date, booking.date_id)
-                if date:
-                    data = request.get_json()
-                    if data:
-                        for k, v in data.items():
-                            if k not in ['id', 'start_date', 'end_date', 'booking_id', 'created_at', 'updated_at']:
-                                setattr(date, k, v)
-                        storage.save()
-                        return jsonify(date.to_dict()), 200
-                    return jsonify({"error": "Not a JSON"}), 400
-                return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if date := storage.get(Date, booking.date_id):
+                if data := request.get_json():
+                    for k, v in data.items():
+                        if k not in ['id', 'start_date', 'end_date', 'booking_id', 'created_at', 'updated_at']:
+                            setattr(date, k, v)
+                    storage.save()
+                    return jsonify(date.to_dict()), 200
+                return jsonify({"error": "Not a JSON"}), 400
             return jsonify({"error": "Not found"}), 404
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/destination', methods=['POST'])
 def create_destination(user_id, booking_id):
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                data = request.get_json()
-                if data:
-                    if data['name'] and data['description']:
-                        destination = Destination()
-                        destination.name = data['name']
-                        destination.description = data['description']
-                        destination.booking_id = booking.id
-                        storage.new(destination)
-                        storage.save()
-                        return jsonify(destination.to_dict()), 201
-                    return jsonify({"error": "Missing data"}), 400
-                return jsonify({"error": "Not a JSON"}), 400
-            return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if data := request.get_json():
+                if data['name'] and data['description']:
+                    destination = Destination()
+                    destination.name = data['name']
+                    destination.description = data['description']
+                    destination.booking_id = booking.id
+                    storage.new(destination)
+                    storage.save()
+                    return jsonify(destination.to_dict()), 201
+                return jsonify({"error": "Missing data"}), 400
+            return jsonify({"error": "Not a JSON"}), 400
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/destination', methods=['GET', 'DELETE'])
 def get_delete_destination(user_id, booking_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                destination = storage.get(Destination, booking.destination_id)
-                if destination:
-                    if request.method == 'GET':
-                        return jsonify(destination.to_dict())
-                    if request.method == 'DELETE':
-                        storage.delete(destination)
-                        storage.save()
-                        return jsonify({}), 200
-                return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if destination := storage.get(Destination, booking.destination_id):
+                if request.method == 'GET':
+                    return jsonify(destination.to_dict())
+                if request.method == 'DELETE':
+                    storage.delete(destination)
+                    storage.save()
+                    return jsonify({}), 200
             return jsonify({"error": "Not found"}), 404
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/users/<user_id>/bookings/<booking_id>/destination', methods=['PUT'])
 def update_destination(user_id, booking_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        user = storage.get(User, user_id)
-        if user:
-            booking = storage.get(Booking, booking_id)
-            if booking:
-                destination = storage.get(Destination, booking.destination_id)
-                if destination:
-                    data = request.get_json()
-                    if data:
-                        for k, v in data.items():
-                            if k not in ['id', 'name', 'description', 'booking_id', 'created_at', 'updated_at']:
-                                setattr(destination, k, v)
-                        storage.save()
-                        return jsonify(destination.to_dict()), 200
-                    return jsonify({"error": "Not a JSON"}), 400
-                return jsonify({"error": "Not found"}), 404
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if user := storage.get(User, user_id):
+        if booking := storage.get(Booking, booking_id):
+            if destination := storage.get(Destination, booking.destination_id):
+                if data := request.get_json():
+                    for k, v in data.items():
+                        if k not in ['id', 'name', 'description', 'booking_id', 'created_at', 'updated_at']:
+                            setattr(destination, k, v)
+                    storage.save()
+                    return jsonify(destination.to_dict()), 200
+                return jsonify({"error": "Not a JSON"}), 400
             return jsonify({"error": "Not found"}), 404
         return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"error": "Not found"}), 404
 
 
 @app.route('/api/v1/destinations', methods=['GET'])
 def index_destinations():
     """Index"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
+    if uin := helper_methods.logged_in(current_user):
         destinations = storage.all(Destination).values()
         return jsonify([destination.to_dict() for destination in destinations])
     return jsonify({"error": "Unauthorized"}), 401
@@ -375,60 +319,52 @@ def index_destinations():
 @app.route('/api/v1/destinations', methods=['POST'])
 def create_destination():
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        data = request.get_json()
-        if data:
-            if data['name'] and data['description']:
-                destination = Destination()
-                destination.name = data['name']
-                destination.description = data['description']
-                storage.new(destination)
-                storage.save()
-                return jsonify(destination.to_dict()), 201
-            return jsonify({"error": "Missing data"}), 400
-        return jsonify({"error": "Not a JSON"}), 400
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if data := request.get_json():
+        if data['name'] and data['description']:
+            destination = Destination()
+            destination.name = data['name']
+            destination.description = data['description']
+            storage.new(destination)
+            storage.save()
+            return jsonify(destination.to_dict()), 201
+        return jsonify({"error": "Missing data"}), 400
+    return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/destinations/<destination_id>', methods=['GET', 'DELETE'])
 def get_delete_destination(destination_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        destination = storage.get(Destination, destination_id)
-        if destination:
-            if request.method == 'GET':
-                return jsonify(destination.to_dict())
-            if request.method == 'DELETE':
-                storage.delete(destination)
-                storage.save()
-                return jsonify({}), 200
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if destination := storage.get(Destination, destination_id):
+        if request.method == 'GET':
+            return jsonify(destination.to_dict())
+        if request.method == 'DELETE':
+            storage.delete(destination)
+            storage.save()
+            return jsonify({}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/destinations/<destination_id>', methods=['PUT'])
 def update_destination(destination_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        destination = storage.get(Destination, destination_id)
-        if destination:
-            data = request.get_json()
-            if data:
-                for k, v in data.items():
-                    if k not in ['id', 'created_at', 'updated_at']:
-                        setattr(destination, k, v)
-                storage.save()
-                return jsonify(destination.to_dict()), 200
-            return jsonify({"error": "Not a JSON"}), 400
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if destination := storage.get(Destination, destination_id):
+        if data := request.get_json():
+            for k, v in data.items():
+                if k not in ['id', 'created_at', 'updated_at']:
+                    setattr(destination, k, v)
+            storage.save()
+            return jsonify(destination.to_dict()), 200
+        return jsonify({"error": "Not a JSON"}), 400
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/flights', methods=['GET'])
 def index_flights():
     """Index"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
+    if uin := helper_methods.logged_in(current_user):
         flights = storage.all(Flight).values()
         return jsonify([flight.to_dict() for flight in flights])
     return jsonify({"error": "Unauthorized"}), 401
@@ -436,65 +372,56 @@ def index_flights():
 @app.route('/api/v1/flights', methods=['POST'])
 def create_flight():
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        data = request.get_json()
-        if data:
-            if data['destination'] and data['departure'] and data['arrival']:
-                destination = storage.get(Destination, data['destination'])
-                if destination:
-                    flight = Flight()
-                    flight.destination_id = destination.id
-                    flight.departure = data['departure']
-                    flight.arrival = data['arrival']
-                    storage.new(flight)
-                    storage.save()
-                    return jsonify(flight.to_dict()), 201
-                return jsonify({"error": "Not found"}), 404
-            return jsonify({"error": "Missing data"}), 400
-        return jsonify({"error": "Not a JSON"}), 400
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if data := request.get_json():
+        if data['destination'] and data['departure'] and data['arrival']:
+            if destination := storage.get(Destination, data['destination']):
+                flight = Flight()
+                flight.destination_id = destination.id
+                flight.departure = data['departure']
+                flight.arrival = data['arrival']
+                storage.new(flight)
+                storage.save()
+                return jsonify(flight.to_dict()), 201
+            return jsonify({"error": "Not found"}), 404
+        return jsonify({"error": "Missing data"}), 400
+    return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/flights/<flight_id>', methods=['GET', 'DELETE'])
 def get_delete_flight(flight_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        flight = storage.get(Flight, flight_id)
-        if flight:
-            if request.method == 'GET':
-                return jsonify(flight.to_dict())
-            if request.method == 'DELETE':
-                storage.delete(flight)
-                storage.save()
-                return jsonify({}), 200
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if flight := storage.get(Flight, flight_id):
+        if request.method == 'GET':
+            return jsonify(flight.to_dict())
+        if request.method == 'DELETE':
+            storage.delete(flight)
+            storage.save()
+            return jsonify({}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/flights/<flight_id>', methods=['PUT'])
 def update_flight(flight_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        flight = storage.get(Flight, flight_id)
-        if flight:
-            data = request.get_json()
-            if data:
-                for k, v in data.items():
-                    if k not in ['id', 'created_at', 'updated_at']:
-                        setattr(flight, k, v)
-                storage.save()
-                return jsonify(flight.to_dict()), 200
-            return jsonify({"error": "Not a JSON"}), 400
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if flight := storage.get(Flight, flight_id):
+        if data := request.get_json():
+            for k, v in data.items():
+                if k not in ['id', 'created_at', 'updated_at']:
+                    setattr(flight, k, v)
+            storage.save()
+            return jsonify(flight.to_dict()), 200
+        return jsonify({"error": "Not a JSON"}), 400
+    return jsonify({"error": "Not found"}), 404
 
 
 @app.route('/api/v1/hotel', methods=['GET'])
 def index_hotels():
     """Index"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
+    if uin := helper_methods.logged_in(current_user):
         hotels = storage.all(Hotel).values()
         return jsonify([hotel.to_dict() for hotel in hotels])
     return jsonify({"error": "Unauthorized"}), 401
@@ -502,60 +429,52 @@ def index_hotels():
 @app.route('/api/v1/hotel', methods=['POST'])
 def create_hotel():
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        data = request.get_json()
-        if data:
-            if data['name'] and data['description']:
-                hotel = Hotel()
-                hotel.name = data['name']
-                hotel.description = data['description']
-                storage.new(hotel)
-                storage.save()
-                return jsonify(hotel.to_dict()), 201
-            return jsonify({"error": "Missing data"}), 400
-        return jsonify({"error": "Not a JSON"}), 400
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if data := request.get_json():
+        if data['name'] and data['description']:
+            hotel = Hotel()
+            hotel.name = data['name']
+            hotel.description = data['description']
+            storage.new(hotel)
+            storage.save()
+            return jsonify(hotel.to_dict()), 201
+        return jsonify({"error": "Missing data"}), 400
+    return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/hotel/<hotel_id>', methods=['GET', 'DELETE'])
 def get_delete_hotel(hotel_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        hotel = storage.get(Hotel, hotel_id)
-        if hotel:
-            if request.method == 'GET':
-                return jsonify(hotel.to_dict())
-            if request.method == 'DELETE':
-                storage.delete(hotel)
-                storage.save()
-                return jsonify({}), 200
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if hotel := storage.get(Hotel, hotel_id):
+        if request.method == 'GET':
+            return jsonify(hotel.to_dict())
+        if request.method == 'DELETE':
+            storage.delete(hotel)
+            storage.save()
+            return jsonify({}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/hotel/<hotel_id>', methods=['PUT'])
 def update_hotel(hotel_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        hotel = storage.get(Hotel, hotel_id)
-        if hotel:
-            data = request.get_json()
-            if data:
-                for k, v in data.items():
-                    if k not in ['id', 'created_at', 'updated_at']:
-                        setattr(hotel, k, v)
-                storage.save()
-                return jsonify(hotel.to_dict()), 200
-            return jsonify({"error": "Not a JSON"}), 400
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if hotel := storage.get(Hotel, hotel_id):
+        if data := request.get_json():
+            for k, v in data.items():
+                if k not in ['id', 'created_at', 'updated_at']:
+                    setattr(hotel, k, v)
+            storage.save()
+            return jsonify(hotel.to_dict()), 200
+        return jsonify({"error": "Not a JSON"}), 400
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/bus', methods=['GET'])
 def index_buses():
     """Index"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
+    if uin := helper_methods.logged_in(current_user):
         buses = storage.all(Bus).values()
         return jsonify([bus.to_dict() for bus in buses])
     return jsonify({"error": "Unauthorized"}), 401
@@ -563,61 +482,53 @@ def index_buses():
 @app.route('/api/v1/bus', methods=['POST'])
 def create_bus():
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        data = request.get_json()
-        if data:
-            if data['name'] and data['description']:
-                bus = Bus()
-                bus.name = data['name']
-                bus.description = data['description']
-                storage.new(bus)
-                storage.save()
-                return jsonify(bus.to_dict()), 201
-            return jsonify({"error": "Missing data"}), 400
-        return jsonify({"error": "Not a JSON"}), 400
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if data := request.get_json():
+        if data['name'] and data['description']:
+            bus = Bus()
+            bus.name = data['name']
+            bus.description = data['description']
+            storage.new(bus)
+            storage.save()
+            return jsonify(bus.to_dict()), 201
+        return jsonify({"error": "Missing data"}), 400
+    return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/bus/<bus_id>', methods=['GET', 'DELETE'])
 def get_delete_bus(bus_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        bus = storage.get(Bus, bus_id)
-        if bus:
-            if request.method == 'GET':
-                return jsonify(bus.to_dict())
-            if request.method == 'DELETE':
-                storage.delete(bus)
-                storage.save()
-                return jsonify({}), 200
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if bus := storage.get(Bus, bus_id):
+        if request.method == 'GET':
+            return jsonify(bus.to_dict())
+        if request.method == 'DELETE':
+            storage.delete(bus)
+            storage.save()
+            return jsonify({}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/bus/<bus_id>', methods=['PUT'])
 def update_bus(bus_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        bus = storage.get(Bus, bus_id)
-        if bus:
-            data = request.get_json()
-            if data:
-                for k, v in data.items():
-                    if k not in ['id', 'created_at', 'updated_at']:
-                        setattr(bus, k, v)
-                storage.save()
-                return jsonify(bus.to_dict()), 200
-            return jsonify({"error": "Not a JSON"}), 400
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if bus := storage.get(Bus, bus_id):
+        if data := request.get_json():
+            for k, v in data.items():
+                if k not in ['id', 'created_at', 'updated_at']:
+                    setattr(bus, k, v)
+            storage.save()
+            return jsonify(bus.to_dict()), 200
+        return jsonify({"error": "Not a JSON"}), 400
+    return jsonify({"error": "Not found"}), 404
 
 
 @app.route('/api/v1/payment', methods=['GET'])
 def index_payments():
     """Index"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
+    if uin := helper_methods.logged_in(current_user):
         payments = storage.all(Payment).values()
         return jsonify([payment.to_dict() for payment in payments])
     return jsonify({"error": "Unauthorized"}), 401
@@ -625,60 +536,52 @@ def index_payments():
 @app.route('/api/v1/payment', methods=['POST'])
 def create_payment():
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        data = request.get_json()
-        if data:
-            if data['name'] and data['description']:
-                payment = Payment()
-                payment.name = data['name']
-                payment.description = data['description']
-                storage.new(payment)
-                storage.save()
-                return jsonify(payment.to_dict()), 201
-            return jsonify({"error": "Missing data"}), 400
-        return jsonify({"error": "Not a JSON"}), 400
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if data := request.get_json():
+        if data['name'] and data['description']:
+            payment = Payment()
+            payment.name = data['name']
+            payment.description = data['description']
+            storage.new(payment)
+            storage.save()
+            return jsonify(payment.to_dict()), 201
+        return jsonify({"error": "Missing data"}), 400
+    return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/payment/<payment_id>', methods=['GET', 'DELETE'])
 def get_delete_payment(payment_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        payment = storage.get(Payment, payment_id)
-        if payment:
-            if request.method == 'GET':
-                return jsonify(payment.to_dict())
-            if request.method == 'DELETE':
-                storage.delete(payment)
-                storage.save()
-                return jsonify({}), 200
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if payment := storage.get(Payment, payment_id):
+        if request.method == 'GET':
+            return jsonify(payment.to_dict())
+        if request.method == 'DELETE':
+            storage.delete(payment)
+            storage.save()
+            return jsonify({}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/payment/<payment_id>', methods=['PUT'])
 def update_payment(payment_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        payment = storage.get(Payment, payment_id)
-        if payment:
-            data = request.get_json()
-            if data:
-                for k, v in data.items():
-                    if k not in ['id', 'created_at', 'updated_at']:
-                        setattr(payment, k, v)
-                storage.save()
-                return jsonify(payment.to_dict()), 200
-            return jsonify({"error": "Not a JSON"}), 400
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if payment := storage.get(Payment, payment_id):
+        if data := request.get_json():
+            for k, v in data.items():
+                if k not in ['id', 'created_at', 'updated_at']:
+                    setattr(payment, k, v)
+            storage.save()
+            return jsonify(payment.to_dict()), 200
+        return jsonify({"error": "Not a JSON"}), 400
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/date', methods=['GET'])
 def index_dates():
     """Index"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
+    if uin := helper_methods.logged_in(current_user):
         dates = storage.all(Date).values()
         return jsonify([date.to_dict() for date in dates])
     return jsonify({"error": "Unauthorized"}), 401
@@ -686,54 +589,47 @@ def index_dates():
 @app.route('/api/v1/date', methods=['POST'])
 def create_date():
     """Create"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        data = request.get_json()
-        if data:
-            if data['name'] and data['description']:
-                date = Date()
-                date.name = data['name']
-                date.description = data['description']
-                storage.new(date)
-                storage.save()
-                return jsonify(date.to_dict()), 201
-            return jsonify({"error": "Missing data"}), 400
-        return jsonify({"error": "Not a JSON"}), 400
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if data := request.get_json():
+        if data['name'] and data['description']:
+            date = Date()
+            date.name = data['name']
+            date.description = data['description']
+            storage.new(date)
+            storage.save()
+            return jsonify(date.to_dict()), 201
+        return jsonify({"error": "Missing data"}), 400
+    return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/date/<date_id>', methods=['GET', 'DELETE'])
 def get_delete_date(date_id):
     """Get or delete"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        date = storage.get(Date, date_id)
-        if date:
-            if request.method == 'GET':
-                return jsonify(date.to_dict())
-            if request.method == 'DELETE':
-                storage.delete(date)
-                storage.save()
-                return jsonify({}), 200
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if date := storage.get(Date, date_id):
+        if request.method == 'GET':
+            return jsonify(date.to_dict())
+        if request.method == 'DELETE':
+            storage.delete(date)
+            storage.save()
+            return jsonify({}), 200
+    return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/date/<date_id>', methods=['PUT'])
 def update_date(date_id):
     """Update"""
-    uin = helper_methods.logged_in(current_user)
-    if uin:
-        date = storage.get(Date, date_id)
-        if date:
-            data = request.get_json()
-            if data:
-                for k, v in data.items():
-                    if k not in ['id', 'created_at', 'updated_at']:
-                        setattr(date, k, v)
-                storage.save()
-                return jsonify(date.to_dict()), 200
-            return jsonify({"error": "Not a JSON"}), 400
-        return jsonify({"error": "Not found"}), 404
-    return jsonify({"error": "Unauthorized"}), 401
+    if not (uin := helper_methods.logged_in(current_user)):
+        return jsonify({"error": "Unauthorized"}), 401
+    if date := storage.get(Date, date_id):
+        if data := request.get_json():
+            for k, v in data.items():
+                if k not in ['id', 'created_at', 'updated_at']:
+                    setattr(date, k, v)
+            storage.save()
+            return jsonify(date.to_dict()), 200
+        return jsonify({"error": "Not a JSON"}), 400
+    return jsonify({"error": "Not found"}), 404
 
 
 @app.errorhandler(404)

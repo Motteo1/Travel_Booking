@@ -14,8 +14,12 @@ from flask_login import UserMixin
 Base = declarative_base()
 
 
-def find_user(user_id):
-    return storage.get_user_by_id(user_id)
+def find_user(user_id):  # sourcery skip: do-not-use-bare-except
+    try:
+        user = User.query.get(user_id)
+    except:
+        user = None
+    return user
 
 class User(Base, UserMixin):
     """Class User is a blueprint to create user objects"""
@@ -50,6 +54,13 @@ class User(Base, UserMixin):
         """Hashes password"""
         secure_pw = generate_password_hash(password)
         setattr(self, 'password', secure_pw)
+    
+    def __check_password(self, password):
+        """
+        Checks password hash against password entered by user at login time
+        returns True or False if they match or not respectively
+        """
+        return check_password_hash(self.password, password)
 
 
 
