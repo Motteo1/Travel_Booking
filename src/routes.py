@@ -8,8 +8,9 @@ from flask_mail import Mail, Message
 import hashlib
 from src import app
 from src.classes.models import User, Booking, Destination, Flight, Hotel, Payment, Bus, Date
+from src.forms import LoginForm, RegistrationForm, BookingForm
 from src.classes import storage
-import helper_methods
+from src import helper_methods
 import os
 import random
 import string
