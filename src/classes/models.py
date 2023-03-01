@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 from datetime import date
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from src import login_user
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.session import object_session
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Integer, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm.session import object_session
