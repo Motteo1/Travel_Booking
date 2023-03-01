@@ -23,9 +23,9 @@ HELPER METHODS
 from datetime import date, datetime
 from flask import Flask
 from flask_mail import Mail, Message
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import current_user
 import os
-from app import app
+from src import app
 from threading import Thread
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -96,7 +96,10 @@ def is_booking_valid(booking):
         return False
     if booking.destination_id is None:
         return False
-    return False if booking.bus_id is None else booking.payment_id is not None
+    if booking.bus_id is None:
+        return False
+    booking.payment_id is not None
+    return True
 
 def email_confirm_trip(booking):
     """Sends email to user confirming trip."""
