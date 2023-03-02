@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Travel Website</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <h1>Enjoying your trip with us?</h1>
+  <p>Share your travel highlights on social media:</p>
+
+  <!-- Facebook share button -->
+  <button onclick="shareOnFacebook()">Share on Facebook</button>
+
+  <!-- Twitter share button -->
+  <button onclick="shareOnTwitter()">Share on Twitter</button>
+
+  <!-- LinkedIn share button -->
+  <button onclick="shareOnLinkedIn()">Share on LinkedIn</button>
+
+  <script>
+    function shareOnFacebook() {
+      window.open("https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.Travel_booking.com%2Fhighlight", "_blank");
+    }
+
+    function shareOnTwitter() {
+      window.open("https://twitter.com/intent/tweet?text=Check%20out%20my%20travel%20highlight%20on%20%40mytravelwebsite%20https%3A%2F%2Fwww.Travel_booking.com%2Fhighlight", "_blank");
+    }
+
+    function shareOnLinkedIn() {
+      window.open("https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.Travel_booking.com%2Fhighlight", "_blank");
+    }
+  </script>
+</body>
+</html>
