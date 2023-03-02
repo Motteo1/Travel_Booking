@@ -110,7 +110,7 @@ IF NOT EXISTS booking
 INSERT INTO booking
     (user_id, destination_id, flight_id, hotel_id, bus_id, date, amount, completed)
 VALUES
-    ("user_id", "destination_id", "flight_id", "hotel_id", "bus_id", "date", "amount", false);
+    (1, 1, 1, 1, 1, '2023-03-1', 1000, false);
 
 CREATE TABLE
 IF NOT EXISTS payment
@@ -124,4 +124,4 @@ IF NOT EXISTS payment
 INSERT INTO payment
     (user_id, booking_id, amount)
 VALUES
-    ("user_id", "booking_id", "amount");
+    (1, 1, 500);
