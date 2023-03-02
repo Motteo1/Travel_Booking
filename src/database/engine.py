@@ -3,6 +3,8 @@
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+import sys
+sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
 from src.classes.models import Base, User, Booking
 Base = declarative_base()
 

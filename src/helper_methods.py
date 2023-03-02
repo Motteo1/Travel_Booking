@@ -25,6 +25,8 @@ from flask import Flask
 from flask_mail import Mail, Message
 from flask_login import current_user
 import os
+import sys
+sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
 from src import app
 from threading import Thread
 

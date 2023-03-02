@@ -2,22 +2,12 @@
 -- Grant usage on *.* to 'booking'@'localhost';
 
 CREATE DATABASE 
-IF NOT EXISTS booking
--- CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED BY '';
+IF NOT EXISTS booking;
 USE booking;
 GRANT ALL PRIVILEGES ON booking.* TO 'root'@'localhost';
-USE performance_schema;
-GRANT SELECT ON performance_schema.* TO 'root'@'localhost';
 FLUSH PRIVILEGES;
-
-USE booking;
-DROP TABLE IF EXISTS `booking`;
-DROP TABLE IF EXISTS `user`;
-DROP TABLE IF EXISTS 'destination';
-DROP TABLE IF EXISTS 'flight';
-DROP TABLE IF EXISTS 'hotel';
-DROP TABLE IF EXISTS 'bus';
-DROP TABLE IF EXISTS 'payment';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
 
 CREATE TABLE
 IF NOT EXISTS user
@@ -28,50 +18,26 @@ IF NOT EXISTS user
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     contact VARCHAR(255) NOT NULL,
-    payment_details VARCHAR(255) NOT NULL,
-    PRIMARY KEY (id)
+    payment_details VARCHAR(255) NOT NULL
 );
+
 INSERT INTO user 
-    (id, first_name, last_name, password, email, contact, payment_details)
-    (first_name, last_name, password, email, contact) 
+    (first_name, last_name, password, email, contact, payment_details)
 VALUES 
-    (0, "first_name", "last_name", "password", "email", "contact", "payment_details");
-
-
-CREATE TABLE
-IF NOT EXISTS booking
-(
-    id INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    destination_id VARCHAR(255) NOT NULL,
-    flight_id INT NOT NULL,
-    hotel_id INT NOT NULL,
-    bus_id INT NOT NULL,
-    date DATE NOT NULL,
-    amount INT NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (destination_id) REFERENCES destination(id),
-    completed BOOLEAN
-);
-INSERT INTO booking
-    (user_id, destination_id, flight_id, hotel_id, bus_id, date, amount, completed)
-
-VALUES
-    (0, "user_id", "destination_id", "flight_id", "hotel_id", "bus_id", "date", "amount");
+    ("first_name", "last_name", "password", "email", "contact", "payment_details");
 
 CREATE TABLE
 IF NOT EXISTS destination
 (
     id INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    PRIMARY KEY (id)
+    description VARCHAR(255) NOT NULL
 );
+
 INSERT INTO destination
-    (id, name, description)
+    (name, description)
 VALUES
-    (0, "name", "description");
+    ("name", "description");
 
 CREATE TABLE
 IF NOT EXISTS flight
@@ -83,13 +49,13 @@ IF NOT EXISTS flight
     date DATE NOT NULL,
     time TIME NOT NULL,
     price INT NOT NULL,
-    PRIMARY KEY (id),
     FOREIGN KEY (destination_id) REFERENCES destination(id)
 );
+
 INSERT INTO flight
-    (id, destination_id, departure, arrival, date, time, price)
+    (destination_id, departure, arrival, date, time, price)
 VALUES
-    (0, "destination_id", "departure", "arrival", "date", "time", "price");
+    (1, "departure", "arrival", "2023-03-01", "12:00:00", 500);
 
 CREATE TABLE
 IF NOT EXISTS hotel
@@ -99,13 +65,13 @@ IF NOT EXISTS hotel
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
     price INT NOT NULL,
-    PRIMARY KEY (id),
     FOREIGN KEY (destination_id) REFERENCES destination(id)
 );
+
 INSERT INTO hotel
-    (id, destination_id, name, description, price)
+    (destination_id, name, description, price)
 VALUES
-    (0, "destination_id", "name", "description", "price");
+    (1, "name", "description", 500);
 
 CREATE TABLE
 IF NOT EXISTS bus
@@ -117,13 +83,34 @@ IF NOT EXISTS bus
     date DATE NOT NULL,
     time TIME NOT NULL,
     price INT NOT NULL,
-    PRIMARY KEY (id),
     FOREIGN KEY (destination_id) REFERENCES destination(id)
 );
+
 INSERT INTO bus
-    (id, destination_id, departure, arrival, date, time, price)
+    (destination_id, departure, arrival, date, time, price)
 VALUES
-    (0, "destination_id", "departure", "arrival", "date", "time", "price");
+    (1, "departure", "arrival", "2023-03-01", "12:00:00", 500);
+
+CREATE TABLE
+IF NOT EXISTS booking
+(
+    id INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    destination_id INT NOT NULL,
+    flight_id INT NOT NULL,
+    hotel_id INT NOT NULL,
+    bus_id INT NOT NULL,
+    date DATE NOT NULL,
+    amount INT NOT NULL,
+    completed BOOLEAN,
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (destination_id) REFERENCES destination(id)
+);
+
+INSERT INTO booking
+    (user_id, destination_id, flight_id, hotel_id, bus_id, date, amount, completed)
+VALUES
+    ("user_id", "destination_id", "flight_id", "hotel_id", "bus_id", "date", "amount", false);
 
 CREATE TABLE
 IF NOT EXISTS payment
@@ -132,11 +119,9 @@ IF NOT EXISTS payment
     user_id INT NOT NULL,
     booking_id INT NOT NULL,
     amount INT NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (booking_id) REFERENCES booking(id)
+    FOREIGN KEY (user_id) REFERENCES booking(id)
 );
 INSERT INTO payment
-    (id, user_id, booking_id, amount)
+    (user_id, booking_id, amount)
 VALUES
-    (0, "user_id", "booking_id", "amount");
+    ("user_id", "booking_id", "amount");

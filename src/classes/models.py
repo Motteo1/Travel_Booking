@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 from datetime import date
+import sys
+sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
 from src import login_user
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean, Float
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm.session import object_session

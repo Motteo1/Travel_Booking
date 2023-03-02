@@ -6,16 +6,19 @@ from flask_login import current_user, login_user, logout_user, login_required
 from flask_cors import CORS
 from flask_mail import Mail, Message
 import hashlib
+import sys
+sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
 from src import app
 from src.classes.models import User, Booking, Destination, Flight, Hotel, Payment, Bus, Date
 from src.forms import LoginForm, RegistrationForm, BookingForm
 from src.classes import storage
 from src import helper_methods
-import os
 import random
 import string
 import string
 from werkzeug.security import check_password_hash
+
+
 
 # app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.url_map.strict_slashes = False

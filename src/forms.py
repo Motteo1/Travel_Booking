@@ -4,6 +4,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, DateField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+import sys
+sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
 from src.classes.user import storage
 
 # python classes that autoconvert to HTML forms in templates
