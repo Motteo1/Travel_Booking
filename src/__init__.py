@@ -12,4 +12,6 @@ login_user = LoginManager(app)
 login_user.login_view = 'login'
 login_user.login_message = 'Please login to access this page.'
 
+import sys
+sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
 from src import routes
