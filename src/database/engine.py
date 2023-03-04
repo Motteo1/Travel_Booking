@@ -18,7 +18,7 @@ class DBStorage:
         pwd = "root"
         host = "localhost"
         db = "booking"
-        self.__engine = create_engine(f'mysql+mysqldb://{user}:{pwd}@{host}/{db}?charset=utf8mb4', pool_pre_ping=True)
+        self.__engine = create_engine('mysql+pymysql://root:3AnXdGtYpdvrsQ7!@localhost/booking')
         self.__metadata = MetaData()
         self.__metadata.reflect(bind=self.__engine)
         Session = sessionmaker(bind=self.__engine, expire_on_commit=False)

@@ -15,7 +15,6 @@ from src.classes import storage
 from src import helper_methods
 import random
 import string
-import string
 from werkzeug.security import check_password_hash
 
 
@@ -26,8 +25,8 @@ app.url_map.strict_slashes = False
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route('/api/v1/users', methods=['GET'])
-def index():
-    """Index"""
+def index_user():
+    """Search for user"""
     uin = helper_methods.logged_in(current_user)
     count = storage.count()
     for user in storage.all(User).values():
@@ -322,7 +321,7 @@ def index_destinations():
     return jsonify({"error": "Unauthorized"}), 401
 
 @app.route('/api/v1/destinations', methods=['POST'])
-def create_destination():
+def create_new_destination():
     """Create"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -338,7 +337,7 @@ def create_destination():
     return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/destinations/<destination_id>', methods=['GET', 'DELETE'])
-def get_delete_destination(destination_id):
+def get_or_delete_destination(destination_id):
     """Get or delete"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -352,7 +351,7 @@ def get_delete_destination(destination_id):
     return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/destinations/<destination_id>', methods=['PUT'])
-def update_destination(destination_id):
+def updated_destination(destination_id):
     """Update"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -539,7 +538,7 @@ def index_payments():
     return jsonify({"error": "Unauthorized"}), 401
 
 @app.route('/api/v1/payment', methods=['POST'])
-def create_payment():
+def create_new_payment():
     """Create"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -555,7 +554,7 @@ def create_payment():
     return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/payment/<payment_id>', methods=['GET', 'DELETE'])
-def get_delete_payment(payment_id):
+def get_or_delete_payment(payment_id):
     """Get or delete"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -569,7 +568,7 @@ def get_delete_payment(payment_id):
     return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/payment/<payment_id>', methods=['PUT'])
-def update_payment(payment_id):
+def updated_payment(payment_id):
     """Update"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -592,7 +591,7 @@ def index_dates():
     return jsonify({"error": "Unauthorized"}), 401
 
 @app.route('/api/v1/date', methods=['POST'])
-def create_date():
+def create_new_date():
     """Create"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -608,7 +607,7 @@ def create_date():
     return jsonify({"error": "Not a JSON"}), 400
 
 @app.route('/api/v1/date/<date_id>', methods=['GET', 'DELETE'])
-def get_delete_date(date_id):
+def get_or_delete_date(date_id):
     """Get or delete"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401
@@ -622,7 +621,7 @@ def get_delete_date(date_id):
     return jsonify({"error": "Not found"}), 404
 
 @app.route('/api/v1/date/<date_id>', methods=['PUT'])
-def update_date(date_id):
+def updated_date(date_id):
     """Update"""
     if not (uin := helper_methods.logged_in(current_user)):
         return jsonify({"error": "Unauthorized"}), 401

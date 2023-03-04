@@ -2,11 +2,10 @@
 """Module for Flask Forms"""
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, DateField
-from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 import sys
 sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
-from src.classes.user import storage
+from src.classes import storage
 
 # python classes that autoconvert to HTML forms in templates
 ENTITY_TYPES = {
@@ -17,7 +16,7 @@ ENTITY_TYPES = {
     'payment': 'Payment',
 }
 
-class BookingForm(Flaskform):
+class BookingForm(FlaskForm):
     """Form for creating a booking"""
     # form fields
     fields = {}
@@ -36,22 +35,23 @@ class BookingForm(Flaskform):
 
 class LoginForm(FlaskForm):
     """Form for logging in"""
-    email = EmailField('Email', validators=[validators.DataRequired(), validators.Email()])
-    password = PasswordField('Password', validators=[validators.DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 class RegistrationForm(FlaskForm):
     """Form for new user registration"""
-    first_name = fields.StringField('First Name', validators=[validators.DataRequired(), validators.Length(min=2, max=20)])
-    last_name = fields.StringField('Last Name', validators=[validators.DataRequired(), validators.Length(min=2, max=20)])
-    email = fields.EmailField('Email', validators=[validators.DataRequired(), validators.Email()])
-    password = fields.PasswordField('Password', validators=[validators.DataRequired()])
-    confirm_password = fields.PasswordField('Confirm Password', validators=[validators.DataRequired(), validators.EqualTo('password')])
-    submit = fields.SubmitField('Sign Up')
+    first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=20)])
+    last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
         """Check if email is already registered"""
         if user := storage.get_user_by_email(email.data):
-            raise validators.ValidationError('That email is already taken. Please choose a different one.')
+            raise ValidationError('That email is already taken. Please choose a different one.')
+
 

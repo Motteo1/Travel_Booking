@@ -105,13 +105,13 @@ def is_booking_valid(booking):
 
 def email_confirm_trip(booking):
     """Sends email to user confirming trip."""
-    msg = Message('Booking Confirmation', You have successfully booked your trip to {booking.destination.name} from {booking.flight.departure_date} to {booking.flight.return_date}. Your hotel is {booking.hotel.name} and your flight number is {booking.flight.flight_number}. Your total cost is {booking.payment.amount}. Thank you for using our service!)
+    msg = Message('Booking Confirmation', body=f"You have Successfully booked your trip to {booking.destination.name} from {booking.flight.departure_date} to {booking.flight.return_date}. Your hotel is {booking.hotel.name} and your flight number is {booking.flight.flight_number}. Your total cost is {booking.payment.amount}. Thank you for using our service!")
     msg.add_recipient(current_user.email)
     mail.send(msg)
 
 def email_cancel_trip(booking):
     """Sends email to user cancelling trip."""
-    msg = Message('Booking Cancellation', You have successfully cancelled your trip to {booking.destination.name} from {booking.flight.departure_date} to {booking.flight.return_date}. Your hotel is {booking.hotel.name} and your flight number is {booking.flight.flight_number}. Your total cost is {booking.payment.amount}. Thank you for using our service!)
+    msg = Message('Booking Cancellation', body=f"You have successfully cancelled your trip to {booking.destination.name} from {booking.flight.departure_date} to {booking.flight.return_date}. Your hotel is {booking.hotel.name} and your flight number is {booking.flight.flight_number}. Your total cost is {booking.payment.amount}. Thank you for using our service!")
     msg.add_recipient(current_user.email)
     mail.send(msg)
 
