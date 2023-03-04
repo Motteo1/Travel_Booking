@@ -2,22 +2,11 @@
 """
 HELPER METHODS
     logged_in:      Returns True if user is logged in. If not, redirects to login page.
-    get_user_by_id: Returns user object by id.
-    get_user_by_email: Returns user object by email.
-    get_booking_by_id: Returns booking object by id.
-    get_booking_by_user_id: Returns booking object by user id.
-    get_destination_by_id: Returns destination object by id.
-    get_flight_by_id: Returns flight object by id.
-    get_hotel_by_id: Returns hotel object by id.
-    get_payment_by_id: Returns payment object by id.
-    get_payment_by_user_id: Returns payment object by user id.
-    get_payment_by_booking_id: Returns payment object by booking id.
-    is_booking_valid: Returns True if booking is valid. If not, returns False.
+    is_booking_valid: Returns True if booking contains either flights, hotels or bus. if at least one is present and payment is made, returns True. If not, returns False. payment is taken from trip_cost.
     email_confirm_trip: Sends email to user confirming trip.
     email_cancel_trip: Sends email to user cancelling trip.
-    skip_hotel: Returns True if hotel is not required. If not, returns False.
-    skip_flight: Returns True if flight is not required. If not, returns False.
-    skip_bus: Returns True if bus is not required. If not, returns False.
+    email_confirm_payment: Sends email to user confirming payment.
+    trip_cost: Calculates total cost of trip.
 
 """
 from datetime import date, datetime
@@ -45,67 +34,34 @@ def logged_in(current_user):
         return True
     except Exception:
         return False
-    
-def get_user_by_id(user_id):
-    """Returns user object by id."""
-    return app.storage.get_user_by_id(user_id)
 
-def get_user_by_email(email):
-    """Returns user object by email."""
-    return app.storage.get_user_by_email(email)
-
-def get_booking_by_id(booking_id):
-    """Returns booking object by id."""
-    return app.storage.get_booking_by_id(booking_id)
-
-def get_booking_by_user_id(user_id):
-    """Returns booking object by user id."""
-    return app.storage.get_booking_by_user_id(user_id)
-
-def get_destination_by_id(destination_id):
-    """Returns destination object by id."""
-    return app.storage.get_destination_by_id(destination_id)
-
-def get_flight_by_id(flight_id):
-    """Returns flight object by id."""
-    return app.storage.get_flight_by_id(flight_id)
-
-def get_hotel_by_id(hotel_id):
-    """Returns hotel object by id."""
-    return app.storage.get_hotel_by_id(hotel_id)
-
-def get_payment_by_id(payment_id):
-    """Returns payment object by id."""
-    return app.storage.get_payment_by_id(payment_id)
-
-def get_payment_by_user_id(user_id):
-    """Returns payment object by user id."""
-    return app.storage.get_payment_by_user_id(user_id)
-
-def get_payment_by_booking_id(booking_id):
-    """Returns payment object by booking id."""
-    return app.storage.get_payment_by_booking_id(booking_id)
+def trip_cost(booking):
+    """Calculates total cost of trip."""
+    cost = 0
+    if booking.flight is not None:
+        cost += booking.flight.price
+    if booking.hotel is not None:
+        cost += booking.hotel.price
+    if booking.bus is not None:
+        cost += booking.bus.price
+    return cost
 
 def is_booking_valid(booking):
-    """Returns True if booking is valid. If not, returns False."""
-    if booking is None:
+    """Returns True if booking contains either flights, hotels or bus. if at least one is present and payment is made, returns True. If not, returns False. payment is taken from trip_cost."""
+    if booking.flight is None and booking.hotel is None and booking.bus is None:
         return False
-    if booking.user_id != current_user.id:
-        return False
-    if booking.flight_id is None:
-        return False
-    if booking.hotel_id is None:
-        return False
-    if booking.destination_id is None:
-        return False
-    if booking.bus_id is None:
-        return False
-    booking.payment_id is not None
-    return True
+    return booking.payment is not None
+
 
 def email_confirm_trip(booking):
     """Sends email to user confirming trip."""
     msg = Message('Booking Confirmation', body=f"You have Successfully booked your trip to {booking.destination.name} from {booking.flight.departure_date} to {booking.flight.return_date}. Your hotel is {booking.hotel.name} and your flight number is {booking.flight.flight_number}. Your total cost is {booking.payment.amount}. Thank you for using our service!")
+    msg.add_recipient(current_user.email)
+    mail.send(msg)
+
+def email_confirm_payment(payment):
+    """Sends email to user confirming payment."""
+    msg = Message('Payment Confirmation', body=f"You have successfully paid ${payment.amount} for your trip to {payment.booking.destination.name} from {payment.booking.flight.departure_date} to {payment.booking.flight.return_date}. Your hotel is {payment.booking.hotel.name} and your flight number is {payment.booking.flight.flight_number}. Thank you for using our service!")
     msg.add_recipient(current_user.email)
     mail.send(msg)
 
@@ -115,14 +71,4 @@ def email_cancel_trip(booking):
     msg.add_recipient(current_user.email)
     mail.send(msg)
 
-def skip_hotel(destination, booking):
-    """Returns True if hotel is not required. If not, returns False."""
-    return destination.hotel_id is None
 
-def skip_flight(destination, booking):
-    """Returns True if flight is not required. If not, returns False."""
-    return destination.flight_id is None
-
-def skip_bus(destination, booking):
-    """Returns True if bus is not required. If not, returns False."""
-    return destination.bus_id is None
