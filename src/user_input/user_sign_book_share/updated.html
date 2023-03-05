@@ -23,11 +23,56 @@
     .cookies {
       display: none;
     }
+  .signup-login-form {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      padding: 20px;
+      background-color: #f2f2f2;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+    .signup-login-form input[type=text], .signup-login-form input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .signup-login-form button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .signup-login-form button:hover {
+      background-color: #45a049;
+    }
   </style>
 </head>
 <body>
   <div class="watermark">
     <span class="watermark-text" >your travel buddy!</span>
+  </div>
+  <div class="signup-login-form">
+    <h2>Sign Up / Login</h2>
+    <form>
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Your username">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Your password">
+
+      <button type="submit">Submit</button>
+    </form>
   </div>
 
   <div class="booking-form" id="booking-form">
@@ -61,6 +106,16 @@
     <button onclick="acceptCookies()">Accept</button>
   </div>
 
+      <!-- top menu code for logged in user -->
+<div class="top-menu">
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Profile</a></li>
+    <li><a href="#">Messages</a></li>
+    <li><a href="#">Settings</a></li>
+    <li><a href="logout.php">Logout</a></li> <!-- logout button -->
+  </ul>
+</div>
   <script>
     function acceptCookies() {
       document.getElementById("cookies").style.display = "none";
@@ -88,4 +143,4 @@
     var isLoggedIn = true; // Change to false to test
 
     if (isLoggedIn) {
-      document.getElementsByClassName("booking-form")[0].style.display = "
+      document.getElementsByClassName("booking-form")[0].style.display = ""
