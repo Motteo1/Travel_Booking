@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Travel</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      z-index: -1;
+    }
+    .watermark-text {
+      font-size: 50px;
+      opacity: 0.5;
+      color: lightblue;
+    }
+    .booking-form {
+      display: none;
+    }
+    .cookies {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="watermark">
+    <span class="watermark-text" >your travel buddy!</span>
+  </div>
+
+  <div class="booking-form" id="booking-form">
+    <h2>Book a Flight or Bus Ticket</h2>
+    <form>
+       <label for="mode">Select a mode of transport:</label>
+    <select id="mode" name="mode">
+      <option value="flight">Flight</option>
+      <option value="bus">Bus</option>
+    </select><br><br>
+
+    <label for="duration">Duration:</label>
+    <input type="number" id="duration" name="duration" min="1" max="30" required> days<br><br>
+
+    <label for="category">Select a category of travel:</label>
+    <select id="category" name="category">
+      <option value="regular">Regular</option>
+      <option value="vip">VIP</option>
+    </select><br><br>
+
+    <label for="passengers">Number of passengers:</label>
+    <input type="number" id="passengers" name="passengers" min="1" max="10" required><br><br>
+
+    <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <div class="cookies" id="cookies">
+    <h2>Cookies</h2>
+    <p>We use cookies to personalize content, to provide social media features and to analyze our traffic. We also share information about your use of our site with our social media, advertising and analytics partners who may combine it with other information that you've provided to them or that they've collected from your use of their services. You consent to our cookies if you continue to use our website.</p>
+    <button onclick="acceptCookies()">Accept</button>
+  </div>
+
+  <script>
+    function acceptCookies() {
+      document.getElementById("cookies").style.display = "none";
+    }
+
+    function showBookingForm() {
+      document.getElementById("booking-form").style.display = "block";
+    }
+
+    function shareOnFacebook() {
+      window.open("https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.mytravel.com%2Fhighlight", "_blank");
+    }
+
+    function shareOnTwitter() {
+      window.open("https://twitter.com/intent/tweet?text=Check%20out%20my%20travel%20highlight%20on%20%40mytravelwebsite%20https%3A%2F%2Fwww.mytravel.com%2Fhighlight", "_blank");
+    }
+
+    function shareOnLinkedIn() {
+      window.open("https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.mytravel.com%2Fhighlight", "_blank");
+    }
+  </script>
+
+  <script>
+    // Check if user is logged in
+    var isLoggedIn = true; // Change to false to test
+
+    if (isLoggedIn) {
+      document.getElementsByClassName("booking-form")[0].style.display = "
