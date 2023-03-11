@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Contact Us - Online Booking System</title>
+	<link rel="stylesheet" href="css/contact.css">
+</head>
+<body>
+	<header>
+		<nav>
+			<a href="index.html"></a>
+			<a href="booking.html"></a>
+			<a href="contact.html" class="active"></a>
+		</nav>
+	</header>
+	<main>
+		<section class="contact-form">
+			<h1>Contact Us</h1>
+			<form action="submit-contact-form.php" method="post">
+				<label for="name">Name:</label>
+				<input type="text" id="name" name="name" required>
+				<label for="email">Email:</label>
+				<input type="email" id="email" name="email" required>
+				<label for="phone">Phone:</label>
+				<input type="tel" id="phone" name="phone" required>
+				<label for="message">Message:</label>
+				<textarea id="message" name="message" required></textarea>
+				<button type="submit">Submit</button>
+			</form>
+		</section>
+		<section class="contact-info">
+			<h2>Contact Information</h2>
+			<p><strong>Address:</strong> 123 Main Street, Anytown USA</p>
+			<p><strong>Phone:</strong> +254786337122</p>
+			<p><strong>Email:</strong> timothykirungu@gmail.com</p>
+			<p><strong>Hours of Operation:</strong> Monday - Friday: 9am - 5pm</p>
+		</section>
+	</main>
+	<footer>
+		<p>&copy; 2023 Online Booking System. All rights reserved.</p>
+		<a href="homepage.html">Home</a>
+	</footer>
+</body>
+</html>

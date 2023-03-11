@@ -1,0 +1,97 @@
+body {
+	background: url('../images/image2.jpg') no-repeat center center fixed;
+	font-family: Arial, sans-serif;
+	background-color: #f2f2f200;
+}
+
+.signup-container {
+	background-color: rgba(95, 85, 85, 0.603);
+	padding: 20px;
+	margin: auto;
+	width: 400px;
+	margin-top: 50px;
+	box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+	border-radius: 10px;
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+h2 {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+	display: block;
+	margin-bottom: 20px;
+	padding: 10px;
+	width: 100%;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	box-sizing: border-box;
+}
+
+button[type="submit"] {
+	background-color: #4CAF50;
+	color: #fff;
+	padding: 10px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+	font-size: 16px;
+	align-items: center;
+}
+
+button[type="submit"]:hover {
+	background-color: #3e8e41;
+}
+
+div.header{
+	width:100%;
+	background: rgba(62, 62, 32, 0);
+	padding-top: 20px;
+	padding-bottom: 30px;
+	text-align: right;
+}
+div.header a{
+	font-size: 20px;
+	color: #fff;
+	padding: 5px 10px;
+	text-decoration: none;
+	border:2px solid transparent;
+	border-bottom: 2px solid #000;
+	border-radius: 2px
+}
+div.header a:hover{
+
+	border-radius: 5px;
+	border:2px solid #fff;
+}
+
+div.footer{
+	background: #4d737703;
+	padding-top: 30px;
+	padding-bottom: 50px;
+	text-align: right;
+}
+div.footer a{
+	color: black;
+	margin-left: 30px;
+	text-decoration: none;
+	border: 1px solid black;
+    padding: 5px;
+	border-color: #000;
+}
+div.footer a:hover{
+	font-weight: bold;
+	color: white;
+	transition: 0.5s all;
+}
