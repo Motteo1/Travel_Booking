@@ -1,21 +1,16 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """APP"""
-from flask import Flask, request, jsonify, abort, flash, url_for, make_response, session, render_template, redirect
+from flask import flash, url_for, session, render_template, redirect
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_cors import CORS
-from flask_mail import Mail, Message
-import hashlib
 import sys
 sys.path.append("C:/Users/TIM/Desktop/Code/Travel_Booking/")
 from src import app
-from src.classes.models import User, Booking, Destination, Flight, Hotel, Payment, Bus, Date
+from src.classes.models import User, Booking
 from src.forms import LoginForm, RegistrationForm, BookingForm
 from src.classes import storage
 from src import helper_methods
-import random
-import string
-from werkzeug.security import check_password_hash
 
 
 
@@ -25,18 +20,21 @@ app.url_map.strict_slashes = False
 cors = CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/sign_in', methods=['POST'])
+def sign_in():
     """Login page for existing users"""
     form = LoginForm()
     if form.validate_on_submit():
         user = helper_methods.get_user_by_email(form.email.data)
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
-            return redirect(url_for('login'))
+            return redirect(url_for('sign_in'))
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('home'))
     return render_template('login.html', title='Sign In', form=form)
+
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -47,7 +45,7 @@ def register():
         user.set_password(form.password.data)
         storage.save(user)
         flash('Welcome to My Travel!')
-        return redirect(url_for('login'))
+        return redirect(url_for('home'))
     return render_template('sign_up.html', title='Sign Up', form=form)
 
 @app.route('/logout')
